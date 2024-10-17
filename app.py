@@ -6,6 +6,8 @@ from datetime import datetime
 from dotenv import load_dotenv
 import json
 
+# import streamlit_authenticator as stauth
+
 # Load environment variables from .env file
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -53,41 +55,71 @@ def generate_post(topic, platform, mood):
     response = llm.invoke(prompt)
     return response
 
-# Streamlit app UI
-st.title("Social Media Post Generator")
+# Authentication
+def check_password():
+    """Returns True if the user had the correct password."""
 
-# User input
-topic = st.text_input("Enter a topic or interest:")
-platform = st.selectbox("Choose a social media platform:", ["Twitter", "Instagram", "LinkedIn", "Facebook"])
-mood = st.slider("Select your mood (1 = Sad, 10 = Excited)", 1, 10)  # Mood slider
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        if st.session_state["password"] == st.secrets["password"]:
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]  # don't store password
+        else:
+            st.session_state["password_correct"] = False
 
-# Generate post button
-if st.button("Generate Post"):
-    if topic:
-        post = generate_post(topic, platform, mood)
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        new_post = {
-            "timestamp": timestamp, 
-            "platform": platform, 
-            "topic": topic, 
-            "mood": mood_description(mood),  # Store mood description
-            "post": post
-        }
-        st.session_state.post_history.append(new_post)
-        save_history(st.session_state.post_history)  # Save to file
-        st.success(f"Generated {platform} post (Mood: {mood_description(mood)}):")
-        st.write(post)
+    if "password_correct" not in st.session_state:
+        # First run, show input for password.
+        st.text_input(
+            "Password", type="password", on_change=password_entered, key="password"
+        )
+        return False
+    elif not st.session_state["password_correct"]:
+        # Password incorrect, show input + error.
+        st.text_input(
+            "Password", type="password", on_change=password_entered, key="password"
+        )
+        st.error("😕 Password incorrect")
+        return False
     else:
-        st.warning("Please enter a topic.")
+        # Password correct.
+        return True
 
-# Display post history
-st.header("Post History")
-for post in reversed(st.session_state.post_history):
-    with st.expander(f"{post['timestamp']} - {post['platform']} post about {post['topic']} (Mood: {post['mood']})"):
-        st.write(post['post'])
+if check_password():
+    # Streamlit app UI
+    st.title("Social Media Post Generator")
 
-# Add a clear history button
-if st.button("Clear History"):
-    st.session_state.post_history = []
-    save_history([])
-    st.success("History cleared!")
+    # User input
+    topic = st.text_input("Enter a topic or interest:")
+    platform = st.selectbox("Choose a social media platform:", ["Twitter", "Instagram", "LinkedIn", "Facebook"])
+    mood = st.slider("Select your mood (1 = Sad, 10 = Excited)", 1, 10)  # Mood slider
+
+    # Generate post button
+    if st.button("Generate Post"):
+        if topic:
+            post = generate_post(topic, platform, mood)
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            new_post = {
+                "timestamp": timestamp, 
+                "platform": platform, 
+                "topic": topic, 
+                "mood": mood_description(mood),  # Store mood description
+                "post": post
+            }
+            st.session_state.post_history.append(new_post)
+            save_history(st.session_state.post_history)  # Save to file
+            st.success(f"Generated {platform} post (Mood: {mood_description(mood)}):")
+            st.write(post)
+        else:
+            st.warning("Please enter a topic.")
+
+    # Display post history
+    st.header("Post History")
+    for post in reversed(st.session_state.post_history):
+        with st.expander(f"{post['timestamp']} - {post['platform']} post about {post['topic']} (Mood: {post['mood']})"):
+            st.write(post['post'])
+
+    # Add a clear history button
+    if st.button("Clear History"):
+        st.session_state.post_history = []
+        save_history([])
+        st.success("History cleared!")
