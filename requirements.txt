@@ -2,4 +2,3 @@ streamlit
 langchain-openai
 langchain-core
 python-dotenv
-json
