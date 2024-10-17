@@ -1,6 +1,8 @@
-﻿# Social Media Post Generator
+# Social Media Post Generator
 
 This Streamlit application uses OpenAI's language model to generate social media posts based on user input. It's designed to create engaging content for various platforms while considering the user's mood.
+
+This is a project for my 3rd year FunWithAI GenEd class at KMITL University
 
 ## Features
 
@@ -21,16 +23,16 @@ This Streamlit application uses OpenAI's language model to generate social media
 
 1. Clone this repository:
    
-
+   ```
    git clone https://github.com/oscarchanadol/AITweetProject.git
    cd AITweetProject
-   
+   ```
 
 
 2. Install the required packages:
    
 
-   pip install -r requirements.txt
+   `pip install -r requirements.txt`
    
 
 
@@ -39,7 +41,7 @@ This Streamlit application uses OpenAI's language model to generate social media
    - Add your OpenAI API key:
      
 
-     OPENAI_API_KEY=your_api_key_here
+    `OPENAI_API_KEY=your_api_key_here`
      
 
 
@@ -48,7 +50,7 @@ This Streamlit application uses OpenAI's language model to generate social media
 1. Run the Streamlit app:
    
 
-   streamlit run app.py
+`streamlit run app.py`
    
 
 
