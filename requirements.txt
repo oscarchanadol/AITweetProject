@@ -1,5 +1,0 @@
-streamlit
-langchain-openai
-landchain-core
-python-dotenv
-json
